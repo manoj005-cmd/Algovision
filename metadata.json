@@ -1,0 +1,5 @@
+{
+  "name": "AlgoVision - Interactive Algorithm Visualization",
+  "description": "An interactive platform to visualize sorting and searching algorithms, test your knowledge with quizzes, and explore AI-powered video generation. Features Quick Sort, Merge Sort, Binary Search, complexity analysis, and a creative corner with Gemini Veo.",
+  "requestFramePermissions": []
+}
