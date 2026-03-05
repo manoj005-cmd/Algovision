@@ -1,10 +1,3 @@
-// Ensure API base includes '/api' regardless of VITE_API_URL value
-const RAW_BASE = ((import.meta as any).env?.VITE_API_URL as string | undefined) || undefined;
-const NORMALIZED_BASE = RAW_BASE ? RAW_BASE.replace(/\/+$/, '') : undefined;
-const API_URL = NORMALIZED_BASE
-    ? (NORMALIZED_BASE.endsWith('/api') ? NORMALIZED_BASE : `${NORMALIZED_BASE}/api`)
-    : 'http://localhost:5000/api';
-
 class ApiService {
     private token: string | null;
 
@@ -32,28 +25,9 @@ class ApiService {
     }
 
     async request(endpoint: string, options: RequestInit = {}): Promise<any> {
-        const url = `${API_URL}${endpoint}`;
-        const config: RequestInit = {
-            ...options,
-            headers: {
-                ...this.getHeaders(),
-                ...(options.headers || {}),
-            },
-        };
-
-        try {
-            const response = await fetch(url, config);
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Request failed');
-            }
-
-            return data;
-        } catch (error) {
-            console.error('API request failed:', error);
-            throw error;
-        }
+        void endpoint;
+        void options;
+        throw new Error('Backend has been removed. This feature is unavailable without a backend API.');
     }
 
     // Auth endpoints
@@ -81,43 +55,61 @@ class ApiService {
 
     // AI endpoints
     async getAlgorithmSuggestion(array: number[], algorithm: string): Promise<string> {
-        const data = await this.request('/ai/algorithm-suggestion', {
-            method: 'POST',
-            body: JSON.stringify({ array, algorithm }),
-        });
-        return data.suggestion;
+        const n = array.length;
+        const sortedPairs = array.slice(1).filter((v, i) => array[i] <= v).length;
+        const sortedness = n <= 1 ? 1 : sortedPairs / (n - 1);
+        const isSorting = ['Quick Sort', 'Merge Sort', 'Selection Sort', 'Insertion Sort'].includes(algorithm);
+
+        if (!isSorting) {
+            return `AI Suggestion\n\nFor searching, if your data is sorted, prefer Binary Search (O(log n)). Otherwise use Linear Search (O(n)).`;
+        }
+
+        if (n <= 25 && sortedness > 0.8) {
+            return `AI Suggestion\n\nYour array is small and already somewhat sorted. Insertion Sort often performs very well here (near O(n)).`;
+        }
+        if (n <= 40) {
+            return `AI Suggestion\n\nFor small arrays, Insertion Sort is a strong practical choice; for guaranteed O(n log n), choose Merge Sort.`;
+        }
+        return `AI Suggestion\n\nFor larger inputs, prefer Merge Sort for predictable O(n log n). Quick Sort is also fast on average but can degrade to O(n^2) in worst cases.`;
     }
 
     async getComplexityAnalysis(array: number[]): Promise<string> {
-        const data = await this.request('/ai/complexity-analysis', {
-            method: 'POST',
-            body: JSON.stringify({ array }),
-        });
-        return data.analysis;
+        const n = array.length;
+        const sortedPairs = array.slice(1).filter((v, i) => array[i] <= v).length;
+        const sortedness = n <= 1 ? 1 : sortedPairs / (n - 1);
+        const hasManyDuplicates = new Set(array).size / Math.max(1, n) < 0.7;
+
+        const lines: string[] = [];
+        lines.push('AI-Powered Analysis');
+        lines.push('');
+        lines.push(`Input size: ${n}`);
+        lines.push(`Estimated sortedness: ${(sortedness * 100).toFixed(0)}%`);
+        lines.push(`Duplicates: ${hasManyDuplicates ? 'many' : 'few'}`);
+        lines.push('');
+        lines.push('Recommendation:');
+        if (n <= 25 && sortedness > 0.8) {
+            lines.push('- Sorting: Insertion Sort (very good on nearly-sorted small arrays).');
+        } else {
+            lines.push('- Sorting: Merge Sort for consistent O(n log n), or Quick Sort for average-case speed.');
+        }
+        lines.push('- Searching: Binary Search only if sorted; otherwise Linear Search.');
+        lines.push('');
+        lines.push('Note: Backend AI service has been removed, so this is a local heuristic summary.');
+        return lines.join('\n');
     }
 
     async generateVideo(prompt: string, base64Image: string, mimeType: string, aspectRatio: '16:9' | '9:16'): Promise<string> {
-        const data = await this.request('/ai/generate-video', {
-            method: 'POST',
-            body: JSON.stringify({ prompt, base64Image, mimeType, aspectRatio }),
-        });
-        // Convert base64 back to blob URL
-        const byteCharacters = atob(data.videoData);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'video/mp4' });
-        return URL.createObjectURL(blob);
+        void prompt;
+        void base64Image;
+        void mimeType;
+        void aspectRatio;
+        throw new Error('Video generation requires a backend service. Backend has been removed.');
     }
 
     async getLowLatencyResponse(prompt: string): Promise<string> {
-        const data = await this.request('/ai/chat', {
-            method: 'POST',
-            body: JSON.stringify({ prompt }),
-        });
-        return data.response;
+        const trimmed = prompt.trim();
+        if (!trimmed) return 'Please enter a question.';
+        return 'Backend AI chat has been removed for deployment. This is an offline build, so AI responses are unavailable.';
     }
 
     logout() {

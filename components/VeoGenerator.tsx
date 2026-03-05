@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/apiService';
-import { fileToBase64 } from '../utils/helpers';const VeoGenerator: React.FC = () => {
+import { fileToBase64 } from '../utils/helpers';
+
+const VeoGenerator: React.FC = () => {
     const [apiKeySelected, setApiKeySelected] = useState<boolean | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [prompt, setPrompt] = useState<string>('Animate this image beautifully.');
@@ -23,8 +25,9 @@ import { fileToBase64 } from '../utils/helpers';const VeoGenerator: React.FC = (
     ];
 
     const checkApiKey = useCallback(async () => {
-        if (window.aistudio && typeof window.aistudio.hasSelectedApiKey === 'function') {
-            const hasKey = await window.aistudio.hasSelectedApiKey();
+        const aistudio = (window as any).aistudio;
+        if (aistudio && typeof aistudio.hasSelectedApiKey === 'function') {
+            const hasKey = await aistudio.hasSelectedApiKey();
             setApiKeySelected(hasKey);
         } else {
             // Fallback for environments where aistudio is not available
@@ -51,8 +54,9 @@ import { fileToBase64 } from '../utils/helpers';const VeoGenerator: React.FC = (
     }, [isLoading]);
 
     const handleSelectKey = async () => {
-        if (window.aistudio && typeof window.aistudio.openSelectKey === 'function') {
-            await window.aistudio.openSelectKey();
+        const aistudio = (window as any).aistudio;
+        if (aistudio && typeof aistudio.openSelectKey === 'function') {
+            await aistudio.openSelectKey();
             // Assume success to avoid race conditions, will be verified on next API call
             setApiKeySelected(true);
         }

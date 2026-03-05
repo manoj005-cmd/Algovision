@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { getLowLatencyResponse } from '../services/geminiService';
+import { apiService } from '../services/apiService';
 
 interface Message {
   text: string;
@@ -24,7 +24,7 @@ const AiAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const aiResponse = await getLowLatencyResponse(`In the context of algorithm visualization (like for Quick Sort, Merge Sort, Binary Search), briefly explain: "${input}"`);
+      const aiResponse = await apiService.getLowLatencyResponse(`In the context of algorithm visualization (like for Quick Sort, Merge Sort, Binary Search), briefly explain: "${input}"`);
       const aiMessage: Message = { text: aiResponse, sender: 'ai' };
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
